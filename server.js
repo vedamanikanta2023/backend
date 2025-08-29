@@ -19,6 +19,7 @@ db.connect((err)=>{
         console.log("Error while connecting to DB",err,"error end")
         return;
     }
+    
     console.log("Connected to DB");
 });
 
