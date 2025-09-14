@@ -5,6 +5,8 @@ const app = express();
 const mysql = require("mysql2");
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
+const { generateJWTToken } = require("./jwtSrvice");
+
 dotenv.config();
 
 app.use(cors());
@@ -83,6 +85,7 @@ app.post("/login", (req, res) => {
           .status(401)
           .json({ message: "Invalid username or password" });
       }
+      const token=generateJWTToken();
 
       // Success ✅
       return res.status(200).json({
@@ -90,6 +93,7 @@ app.post("/login", (req, res) => {
         user: {
           id: user.id,
           username: user.username,
+          token,
           email: user.email,
         },
       });
