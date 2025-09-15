@@ -1,4 +1,3 @@
-// const jwt = require('jsonwebtoken');
 import jwt from 'jsonwebtoken';
 
 export const generateJWTToken= (req, res) => {
@@ -16,7 +15,7 @@ export const generateJWTToken= (req, res) => {
     return token
 }
 
-export const verifyJWTToken= (req, res,next) => {
+export const authenticateUserWithToken= (req, res,next) => {
     // Tokens are generally passed in header of request
     // Due to security reasons.
 

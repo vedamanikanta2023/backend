@@ -2,10 +2,10 @@ const dotenv = require("dotenv");
 const express = require("express");
 const bcrypt=require("bcrypt");
 const app = express();
-const mysql = require("mysql2");
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
-const { generateJWTToken } = require("./jwtSrvice");
+const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
+const { db } = require("./db");
 
 dotenv.config();
 
@@ -13,12 +13,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+// const db = mysql.createConnection({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_NAME,
+// });
+
 
 db.connect((err) => {
   if (err) {
@@ -27,6 +28,15 @@ db.connect((err) => {
   }
   console.log("Connected to DB");
 });
+
+app.get("/user-details/:id", authenticateUserWithToken,(req, res) => {
+  const userId = req.params.id;
+  console.log("User id is", userId);    
+  db.query(
+    `SELECT id, username, email FROM users WHERE id = ?`,
+    [userId], )  
+  }
+  );
 
 app.post("/user-register", async (req, res) => {
   try {
