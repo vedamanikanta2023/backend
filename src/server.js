@@ -6,6 +6,7 @@ const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
 const { db } = require("./db");
+const { getUserFromDB } = require("./services/userService");
 
 dotenv.config();
 
@@ -29,14 +30,15 @@ db.connect((err) => {
   console.log("Connected to DB");
 });
 
-app.get("/user-details/:id", authenticateUserWithToken,(req, res) => {
+app.get("/user/:id", async (req, res) => {
   const userId = req.params.id;
-  console.log("User id is", userId);    
-  db.query(
-    `SELECT id, username, email FROM users WHERE id = ?`,
-    [userId], )  
-  }
-  );
+  const user = await getUserFromDB(userId);
+  console.log("user",user)
+  // 3. Store in cache with TTL = 60 seconds
+  // await redisClient.setEx(`user:${userId}`, 60, JSON.stringify(user));
+
+  res.status(200).json({ ...user });
+});
 
 app.post("/user-register", async (req, res) => {
   try {
