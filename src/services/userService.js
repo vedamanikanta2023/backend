@@ -1,9 +1,8 @@
 const { db } = require("../db");
 
-
 const getUserFromDB = (id) => {
   return new Promise((resolve, reject) => {
-db.query(
+    db.query(
       `SELECT id, username, email, role, createdAt FROM users WHERE id = ?`,
       [id],
       (err, result) => {
@@ -19,4 +18,3 @@ db.query(
 };
 
 module.exports = { getUserFromDB };
-
