@@ -57,10 +57,12 @@ app.post("/user-register", async (req, res) => {
       `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
       [username, email, hashedPassword],
       (err, result) => {
+        
         if (err) {
           console.error("DB Error:", err);
           return res.status(500).json({ message: "Error in creating user" });
         }
+
         return res
           .status(201)
           .json({ message: "Created user successfully", userId: result.insertId });
