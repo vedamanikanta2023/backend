@@ -5,8 +5,9 @@ const app = express();
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
-const { db } = require("./db");
+// const { db } = require("./db");
 const { getUserFromDB } = require("./services/userService");
+const sequelize = require("./db");
 
 dotenv.config();
 
@@ -14,6 +15,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
 
+sequelize.sync({alter:true})
+.then(()=>console.log("Tables synced successfully"))
+.catch(err=>console.log("Error syncing the tables: ",err));
 // const db = mysql.createConnection({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
@@ -22,13 +26,13 @@ app.use(express.urlencoded({ extended: true })); // For form-data bodies
 // });
 
 
-db.connect((err) => {
-  if (err) {
-    console.log("Error while connecting to DB", err, "error end");
-    return;
-  }
-  console.log("Connected to DB");
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.log("Error while connecting to DB", err, "error end");
+//     return;
+//   }
+//   console.log("Connected to DB");
+// });
 
 app.get("/user/:id", async (req, res) => {
   const userId = req.params.id;
@@ -44,7 +48,6 @@ app.post("/user-register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const keysOfBody = Object.keys(req.body);
-    console.log("body", req.body, keysOfBody,new Date().toDateString(), "end body");
 
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -163,6 +166,11 @@ app.get("/user/validateToken", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
+
+// MySQL query to get all tables in the current database
+const [results, metadata] = await sequelize.query("SHOW TABLES");
+
+console.log("Tables in DB:", results);
 app.listen(PORT, () => {
   console.log(`server running at ${PORT}`);
 });
