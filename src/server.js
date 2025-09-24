@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
 // const { db } = require("./db");
 const { getUserFromDB } = require("./services/userService");
-// const sequelize = require("./db");
+const sequelize = require("./db");
 
 dotenv.config();
 
@@ -15,9 +15,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
 
-// sequelize.sync({alter:true})
-// .then(()=>console.log("Tables synced successfully"))
-// .catch(err=>console.log("Error syncing the tables: ",err));
+sequelize.sync({alter:true})
+.then(()=>console.log("Tables synced successfully"))
+.catch(err=>console.log("Error syncing the tables: ",err));
 // const db = mysql.createConnection({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
