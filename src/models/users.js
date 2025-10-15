@@ -1,5 +1,5 @@
 const {DataTypes} = require("sequelize");
-const {sequelize} = require("../db");
+const sequelize = require("../db");
 
 const User = sequelize.define("users",{
     id:{
@@ -21,7 +21,7 @@ const User = sequelize.define("users",{
         }
     },
     password:{
-        tyep: DataTypes.STRING(100),
+        type: DataTypes.STRING(100),
         allowNull:false
     },
     role:{
