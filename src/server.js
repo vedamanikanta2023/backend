@@ -8,16 +8,13 @@ const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require(
 // const { db } = require("./db");
 const { getUserFromDB } = require("./services/userService");
 const sequelize = require("./db");
-const User = require("./models/users");
-const UserDetails = require("./models/userDetails");
-(async () => {
-  try {
-    await UserDetails.sync({ alter: true }); // creates or updates only this table
-    console.log("✅ Category table created or updated successfully");
-  } catch (err) {
-    console.error("❌ Error creating table:", err);
-  }
-})();
+
+const createUpdateTables = require("./models/createModels");
+
+if( process.env.ALTER_TABLES===true ){
+  createUpdateTables(process.env.ALTER_TABLES);
+}
+
 dotenv.config();
 
 app.use(cors());
