@@ -27,28 +27,10 @@ app.use(express.urlencoded({ extended: true })); // For form-data bodies
 sequelize.sync()
 .then(()=>console.log("Tables synced successfully"))
 .catch(err=>console.log("Error syncing the tables: ",err));
-// const db = mysql.createConnection({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.D  B_NAME,
-// });
-
-
-// db.connect((err) => {
-//   if (err) {
-//     console.log("Error while connecting to DB", err, "error end");
-//     return;
-//   }
-//   console.log("Connected to DB");
-// });
 
 app.get("/user/:id", async (req, res) => {
   const userId = req.params.id;
   const user = await getUserFromDB(userId);
-  console.log("user",user)
-  // 3. Store in cache with TTL = 60 seconds
-  // await redisClient.setEx(`user:${userId}`, 60, JSON.stringify(user));
 
   res.status(200).json({ ...user });
 });
@@ -178,10 +160,10 @@ const PORT = process.env.PORT || 3000;
 
 // MySQL query to get all tables in the current database
 async function db(){
-
   const [results, metadata] = await sequelize.query("SHOW TABLES");
   console.log("Tables in DB:", results);
 }
+
 db();
 app.listen(PORT, () => {
   console.log(`server running at ${PORT}`);
