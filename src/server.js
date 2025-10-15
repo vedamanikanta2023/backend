@@ -8,7 +8,16 @@ const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require(
 // const { db } = require("./db");
 const { getUserFromDB } = require("./services/userService");
 const sequelize = require("./db");
-
+const User = require("./models/users");
+const UserDetails = require("./models/userDetails");
+(async () => {
+  try {
+    await UserDetails.sync({ alter: true }); // creates or updates only this table
+    console.log("✅ Category table created or updated successfully");
+  } catch (err) {
+    console.error("❌ Error creating table:", err);
+  }
+})();
 dotenv.config();
 
 app.use(cors());
@@ -22,7 +31,7 @@ sequelize.sync({alter:true})
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
 //   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_NAME,
+//   database: process.env.D  B_NAME,
 // });
 
 
@@ -168,9 +177,12 @@ const PORT = process.env.PORT || 3000;
 
 
 // MySQL query to get all tables in the current database
-const [results, metadata] = await sequelize.query("SHOW TABLES");
+async function db(){
 
-console.log("Tables in DB:", results);
+  const [results, metadata] = await sequelize.query("SHOW TABLES");
+  console.log("Tables in DB:", results);
+}
+db();
 app.listen(PORT, () => {
   console.log(`server running at ${PORT}`);
 });
