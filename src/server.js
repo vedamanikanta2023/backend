@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
 
-sequelize.sync({alter:true})
+sequelize.sync()
 .then(()=>console.log("Tables synced successfully"))
 .catch(err=>console.log("Error syncing the tables: ",err));
 // const db = mysql.createConnection({
