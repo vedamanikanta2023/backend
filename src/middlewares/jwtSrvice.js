@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
+const jwt  = require("jsonwebtoken");
 
-export const generateJWTToken= (req, res) => {
+const generateJWTToken= (req, res) => {
     // Validate User Here
     // Then generate JWT Token
 
@@ -15,7 +15,7 @@ export const generateJWTToken= (req, res) => {
     return token
 }
 
-export const authenticateUserWithToken= (req, res,next) => {
+const authenticateUserWithToken= (req, res,next) => {
     // Tokens are generally passed in header of request
     // Due to security reasons.
 
@@ -38,3 +38,5 @@ export const authenticateUserWithToken= (req, res,next) => {
         return res.status(401).send(` Access Denied.. ${error}`);
     }
 }
+
+module.exports = {generateJWTToken,authenticateUserWithToken}

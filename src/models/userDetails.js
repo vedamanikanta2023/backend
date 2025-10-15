@@ -44,7 +44,6 @@ const UserDetails = sequelize.define("userDetails", {
   timestamps: true, // adds createdAt & updatedAt
 });
 
-// Association: one user → one userDetails
 User.hasOne(UserDetails, { foreignKey: "userId" });
 UserDetails.belongsTo(User, { foreignKey: "userId" });
 
