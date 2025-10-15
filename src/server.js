@@ -4,16 +4,17 @@ const bcrypt=require("bcrypt");
 const app = express();
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
-const { generateJWTToken, verifyJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
+const { generateJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
 // const { db } = require("./db");
 const { getUserFromDB } = require("./services/userService");
 const sequelize = require("./db");
 
 const createUpdateTables = require("./models/createModels");
+const User = require("./models/users");
 
-if( process.env.ALTER_TABLES===true ){
-  createUpdateTables(process.env.ALTER_TABLES);
-}
+// if( process.env.ALTER_TABLES === true ){
+//   createUpdateTables(process.env.ALTER_TABLES);
+// }
 
 dotenv.config();
 
@@ -43,25 +44,13 @@ app.post("/user-register", async (req, res) => {
 
     // Hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
+    const createUser = await User.create({ username, email, password:hashedPassword });
 
-    db.query(
-      `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
-      [username, email, hashedPassword],
-      (err, result) => {
-        
-        if (err) {
-          console.error("DB Error:", err);
-          return res.status(500).json({ message: "Error in creating user" });
-        }
+    res.json(createUser)
 
-        return res
-          .status(201)
-          .json({ message: "Created user successfully", userId: result.insertId });
-      }
-    );
   } catch (error) {
     console.error("Server error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error",error });
   }
 });
 
@@ -69,6 +58,12 @@ app.post("/login", (req, res) => {
   const { username, password } = req.body;
   console.log(`Login request @ ${new Date().toISOString()}`, req.body);
 
+  const users = User.findAll({
+    where: {
+      username
+    },
+  });
+  console.log("users",users,"end_users")
   const sqlQuery = `SELECT * FROM users WHERE username = ?`;
 
   db.query(sqlQuery, [username], async (err, result) => {
@@ -156,12 +151,12 @@ const PORT = process.env.PORT || 3000;
 
 
 // MySQL query to get all tables in the current database
-async function db(){
+async function dbTables(){
   const [results, metadata] = await sequelize.query("SHOW TABLES");
   console.log("Tables in DB:", results);
 }
 
-db();
+dbTables();
 app.listen(PORT, () => {
   console.log(`server running at ${PORT}`);
 });
