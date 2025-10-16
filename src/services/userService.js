@@ -1,19 +1,15 @@
-const { db } = require("../db");
+const User = require("../models/users");
 
 const getUserFromDB = (id) => {
-  return new Promise((resolve, reject) => {
-    db.query(
-      `SELECT id, username, email, role, createdAt FROM users WHERE id = ?`,
-      [id],
-      (err, result) => {
-        if (err) {
-          console.error("DB Error:", err);
-          return reject(err);
-        }
+  return new Promise(async(resolve, reject) => {
+    const user = await User.findOne({ where: { id } });
 
-        resolve(result[0]); // return first row
-      }
-    );
+    if (!!!user) {
+      return reject({message:"user not found"});
+    }
+    const cleanData = user.toJSON();
+    delete cleanData.password;
+    resolve(cleanData); 
   });
 };
 
