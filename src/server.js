@@ -54,54 +54,46 @@ app.post("/user-register", async (req, res) => {
   }
 });
 
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  console.log(`Login request @ ${new Date().toISOString()}`, req.body);
+app.post("/login",async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-  const users = User.findAll({
-    where: {
-      username
-    },
-  });
-  console.log("users",users,"end_users")
-  const sqlQuery = `SELECT * FROM users WHERE username = ?`;
-
-  db.query(sqlQuery, [username], async (err, result) => {
-    if (err) {
-      console.error("Error retrieving data from DB", err);
-      return res.status(500).json({ message: "Internal server error" });
+    // 1️⃣ Validate input
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
     }
 
-    if (result.length === 0) {
+    // 2️⃣ Find user by username
+    const user = await User.findOne({ where: { username } });
+
+    if (!user) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    const user = result[0];
-
-    try {
-      const isMatch = await bcrypt.compare(password, user.password); // check against hashed value
-      if (!isMatch) {
-        return res
-          .status(401)
-          .json({ message: "Invalid username or password" });
-      }
-      const token=generateJWTToken();
-
-      // Success ✅
-      return res.status(200).json({
-        message: "Login successful",
-        user: {
-          id: user.id,
-          username: user.username,
-          token,
-          email: user.email,
-        },
-      });
-    } catch (err) {
-      console.error("Error comparing password:", err);
-      return res.status(500).json({ message: "Internal server error" });
+    // 3️⃣ Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-  });
+
+    // 4️⃣ Generate JWT token
+    const token = generateJWTToken();
+
+    // 5️⃣ Send response
+    return res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        token,
+      },
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.get("", (req, res) => {
