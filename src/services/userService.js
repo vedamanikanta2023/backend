@@ -21,7 +21,7 @@ const getUserDetailsFromDB = (id)=>{
     if(!!!userDetails){
       return reject({userDetials:undefined});
     };
-    console.log(user)
+
     resolve(userDetails.toJSON());
   })
 }
