@@ -3,19 +3,12 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const app = express();
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const {
-  generateJWTToken,
-  authenticateUserWithToken,
-} = require("./middlewares/jwtSrvice");
-// const { db } = require("./db");
-const {
-  getUserFromDB,
-  getUserDetailsFromDB,
-} = require("./services/userService");
+const { generateJWTToken } = require("./middlewares/jwtSrvice");
+const { getUserDetailsFromDB } = require("./services/userDetailsService");
+const { getUserFromDB } = require("./services/userService");
 const sequelize = require("./db");
+// const createUpdateTables = require("./models/createModels"); to create new models/alter the tables uncomment this and callthis method //
 
-const createUpdateTables = require("./models/createModels");
 const User = require("./models/users");
 
 // if( process.env.ALTER_TABLES === true ){
@@ -50,7 +43,7 @@ app.get("/userdetails/:id", async (req, res) => {
     return res.status(404).json({
       success: false,
       message: error.message || "User not found",
-      data: null
+      data: null,
     });
   }
 });

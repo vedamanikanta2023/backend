@@ -1,4 +1,3 @@
-const UserDetails = require("../models/userDetails");
 const User = require("../models/users");
 
 const getUserFromDB = (id) => {
@@ -14,16 +13,4 @@ const getUserFromDB = (id) => {
   });
 };
 
-const getUserDetailsFromDB = (id)=>{
-  return new Promise(async(resolve,reject)=>{
-    const userDetails = await UserDetails.findOne({where:{userId:id}});
-
-    if(!!!userDetails){
-      return reject({userDetials:undefined});
-    };
-
-    resolve(userDetails.toJSON());
-  })
-}
-
-module.exports = { getUserFromDB, getUserDetailsFromDB };
+module.exports = { getUserFromDB };
