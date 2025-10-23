@@ -1,12 +1,18 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const bcrypt=require("bcrypt");
+const bcrypt = require("bcrypt");
 const app = express();
 const cors = require("cors");
-const jwt = require('jsonwebtoken');
-const { generateJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
+const jwt = require("jsonwebtoken");
+const {
+  generateJWTToken,
+  authenticateUserWithToken,
+} = require("./middlewares/jwtSrvice");
 // const { db } = require("./db");
-const { getUserFromDB } = require("./services/userService");
+const {
+  getUserFromDB,
+  getUserDetailsFromDB,
+} = require("./services/userService");
 const sequelize = require("./db");
 
 const createUpdateTables = require("./models/createModels");
@@ -22,15 +28,31 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
 
-sequelize.sync()
-.then(()=>console.log("Tables synced successfully"))
-.catch(err=>console.log("Error syncing the tables: ",err));
+sequelize
+  .sync()
+  .then(() => console.log("Tables synced successfully"))
+  .catch((err) => console.log("Error syncing the tables: ", err));
 
 app.get("/user/:id", async (req, res) => {
   const userId = req.params.id;
   const user = await getUserFromDB(userId);
 
   res.status(200).json({ ...user });
+});
+
+app.get("/userdetails/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userDetails = await getUserDetailsFromDB(userId); // example id
+    console.log("User details:", userDetails);
+    res.status(200).json({ ...userDetails });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message || "User not found",
+      data: null
+    });
+  }
 });
 
 app.post("/user-register", async (req, res) => {
@@ -44,23 +66,28 @@ app.post("/user-register", async (req, res) => {
 
     // Hash password with bcrypt
     const hashedPassword = await bcrypt.hash(password, 10); // 10 = salt rounds
-    const createUser = await User.create({ username, email, password:hashedPassword });
+    const createUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
 
-    res.json(createUser)
-
+    res.json(createUser);
   } catch (error) {
     console.error("Server error:", error);
-    return res.status(500).json({ message: "Internal server error",error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 });
 
-app.post("/login",async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
     // 1️⃣ Validate input
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
     }
 
     // 2️⃣ Find user by username
@@ -89,7 +116,6 @@ app.post("/login",async (req, res) => {
         token,
       },
     });
-
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -102,9 +128,8 @@ app.get("", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-
 // MySQL query to get all tables in the current database
-async function dbTables(){
+async function dbTables() {
   const [results, metadata] = await sequelize.query("SHOW TABLES");
   console.log("Tables in DB:", results);
 }
