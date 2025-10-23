@@ -3,9 +3,12 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const app = express();
 const cors = require("cors");
+
 const { generateJWTToken } = require("./middlewares/jwtSrvice");
 const { getUserDetailsFromDB } = require("./services/userDetailsService");
 const { getUserFromDB } = require("./services/userService");
+
+const userDetailsRoutes = require("./controllers/routes/userDetails");
 const sequelize = require("./db");
 // const createUpdateTables = require("./models/createModels"); to create new models/alter the tables uncomment this and callthis method //
 
@@ -20,6 +23,8 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For form-data bodies
+
+app.use("/userdetails",userDetailsRoutes);
 
 sequelize
   .sync()
