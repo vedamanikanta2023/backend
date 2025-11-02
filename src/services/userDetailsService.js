@@ -5,7 +5,7 @@ const getUserDetailsFromDB = (id)=>{
     const userDetails = await UserDetails.findOne({where:{userId:id}});
 
     if(!!!userDetails){
-      return reject({userDetials:undefined});
+      return reject(undefined);
     };
 
     resolve(userDetails.toJSON());
