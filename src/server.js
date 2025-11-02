@@ -42,13 +42,13 @@ app.get("/userdetails/:id", async (req, res) => {
   try {
     const userId = req.params.id;
     const userDetails = await getUserDetailsFromDB(userId); // example id
-    console.log("User details:", userDetails);
+    console.log("User details:", new Date().toLocaleDateString(),userDetails);
     res.status(200).json({ ...userDetails });
   } catch (error) {
+    console.log("in getting user error occured",error)
     return res.status(404).json({
-      success: false,
-      message: error.message || "User not found",
-      data: null,
+      error: error || "User not found",
+      message: "The user with the provided ID does not exist."
     });
   }
 });
