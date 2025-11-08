@@ -1,5 +1,6 @@
 const express = require("express");
 const UserDetails = require("../../models/userDetails");
+const { authenticateUserWithToken } = require("../../middlewares/jwtSrvice");
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
  * @desc    Create new user details
  * @access  Public or Protected (based on your app)
  */
-router.post("", async (req, res) => {
+router.post("",authenticateUserWithToken, async (req, res) => {
   try {
     const { userId, name, phoneNumber, address, age, gender } = req.body;
 

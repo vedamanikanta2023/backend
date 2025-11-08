@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const app = express();
 const cors = require("cors");
 
-const { generateJWTToken } = require("./middlewares/jwtSrvice");
+const { generateJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
 const { getUserDetailsFromDB } = require("./services/userDetailsService");
 const { getUserFromDB } = require("./services/userService");
 
@@ -31,14 +31,14 @@ sequelize
   .then(() => console.log("Tables synced successfully"))
   .catch((err) => console.log("Error syncing the tables: ", err));
 
-app.get("/user/:id", async (req, res) => {
+app.get("/user/:id",authenticateUserWithToken, async (req, res) => {
   const userId = req.params.id;
   const user = await getUserFromDB(userId);
 
   res.status(200).json({ ...user });
 });
 
-app.get("/userdetails/:id", async (req, res) => {
+app.get("/userdetails/:id",authenticateUserWithToken, async (req, res) => {
   try {
     const userId = req.params.id;
     const userDetails = await getUserDetailsFromDB(userId); // example id
