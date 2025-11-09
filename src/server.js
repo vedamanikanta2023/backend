@@ -3,6 +3,8 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const app = express();
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 const { generateJWTToken, authenticateUserWithToken } = require("./middlewares/jwtSrvice");
 const { getUserDetailsFromDB } = require("./services/userDetailsService");
@@ -121,7 +123,17 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("", (req, res) => {
-  res.send("Hello");
+  const filePath = path.join(__dirname, "home.html");
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("❌ Error reading HTML file:", err);
+      res.status(500).send("Error loading HTML file");
+    } else {
+      res.setHeader("Content-Type", "text/html");
+      res.send(data); // send HTML content as response
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3000;
